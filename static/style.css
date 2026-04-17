@@ -1,36 +1,199 @@
-/* ⭐ STAR SYSTEM */
-.rating {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: start;
-}
+from flask import Flask, render_template, request, redirect, session, send_from_directory
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+import json, os
 
-.rating input {
-    display: none;
-}
+app = Flask(__name__)
+app.secret_key = "secret123"
 
-.rating label {
-    font-size: 28px;
-    color: #ccc;
-    cursor: pointer;
-}
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-.rating input:checked ~ label {
-    color: gold;
-}
+DATA_FILE = "data.json"
 
-.rating label:hover,
-.rating label:hover ~ label {
-    color: gold;
-}
 
-/* ⭐ DISPLAY STARS (READ ONLY) */
-.star-display {
-    color: gold;
-    font-size: 18px;
-}
+# ---------- DATA ----------
+def load_data():
+    if not os.path.exists(DATA_FILE):
+        return {"users": [], "admins": [], "products": [], "reviews": []}
+    with open(DATA_FILE) as f:
+        return json.load(f)
 
-/* UI cards */
-.card {
-    border-radius: 12px;
-}
+
+def save_data(data):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+# ---------- LOGIN ----------
+@app.route("/", methods=["GET", "POST"])
+def login():
+    data = load_data()
+
+    if request.method == "POST":
+        u = request.form["username"]
+        p = request.form["password"]
+
+        for admin in data["admins"]:
+            if admin["username"] == u and check_password_hash(admin["password"], p):
+                session["admin"] = u
+                return redirect("/admin_dashboard")
+
+        for user in data["users"]:
+            if user["username"] == u and check_password_hash(user["password"], p):
+                session["user"] = u
+                return redirect("/user_dashboard")
+
+    return render_template("login.html")
+
+
+# ---------- REGISTER ----------
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    data = load_data()
+
+    if request.method == "POST":
+        data["users"].append({
+            "username": request.form["username"],
+            "password": generate_password_hash(request.form["password"])
+        })
+        save_data(data)
+        return redirect("/")
+
+    return render_template("register.html")
+
+
+# ---------- USER DASHBOARD ----------
+@app.route("/user_dashboard")
+def user_dashboard():
+    if "user" not in session:
+        return redirect("/")
+
+    data = load_data()
+    query = request.args.get("q", "").lower()
+
+    products = data["products"]
+
+    if query:
+        products = [p for p in products if query in p["name"].lower()]
+
+    for p in products:
+        reviews = [r for r in data["reviews"] if r["product_id"] == p["id"] and r["approved"]]
+        p["avg"] = round(sum(r["rating"] for r in reviews) / len(reviews), 1) if reviews else 0
+        p["count"] = len(reviews)
+
+    return render_template("user_dashboard.html", products=products, query=query)
+
+
+# ---------- PRODUCT PAGE ----------
+@app.route("/product/<int:pid>")
+def product(pid):
+    data = load_data()
+
+    product = next(p for p in data["products"] if p["id"] == pid)
+    reviews = [r for r in data["reviews"] if r["product_id"] == pid and r["approved"]]
+
+    avg = round(sum(r["rating"] for r in reviews) / len(reviews), 1) if reviews else 0
+
+    return render_template("product.html", product=product, reviews=reviews, avg=avg)
+
+
+# ---------- ADD REVIEW ----------
+@app.route("/review/<int:pid>", methods=["POST"])
+def add_review(pid):
+    data = load_data()
+
+    data["reviews"].append({
+        "id": len(data["reviews"]) + 1,
+        "product_id": pid,
+        "user": session.get("user"),
+        "rating": int(request.form["rating"]),
+        "text": request.form["text"],
+        "approved": False
+    })
+
+    save_data(data)
+    return redirect("/user_dashboard")
+
+
+# ---------- ADMIN DASHBOARD ----------
+@app.route("/admin_dashboard")
+def admin_dashboard():
+    if "admin" not in session:
+        return redirect("/")
+
+    data = load_data()
+
+    stats = {
+        "users": len(data["users"]),
+        "admins": len(data["admins"]),
+        "products": len(data["products"]),
+        "reviews": len(data["reviews"])
+    }
+
+    return render_template(
+        "admin_dashboard.html",
+        stats=stats,
+        users=data["users"],
+        admins=data["admins"],
+        products=data["products"]
+    )
+
+
+# ---------- ADD PRODUCT ----------
+@app.route("/add_product", methods=["POST"])
+def add_product():
+    if not session.get("admin"):
+        return redirect("/")
+
+    data = load_data()
+
+    file = request.files["image"]
+    filename = file.filename
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
+
+    data["products"].append({
+        "id": len(data["products"]) + 1,
+        "name": request.form["name"],
+        "image": filename,
+        "created_by": session["admin"],
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    })
+
+    save_data(data)
+    return redirect("/admin_dashboard")
+
+
+# ---------- PROMOTE USER TO ADMIN ----------
+@app.route("/make_admin/<username>")
+def make_admin(username):
+    if not session.get("admin"):
+        return redirect("/")
+
+    data = load_data()
+
+    user = next((u for u in data["users"] if u["username"] == username), None)
+
+    if user:
+        data["admins"].append(user)
+        data["users"] = [u for u in data["users"] if u["username"] != username]
+
+    save_data(data)
+    return redirect("/admin_dashboard")
+
+
+# ---------- SERVE IMAGES ----------
+@app.route("/uploads/<filename>")
+def uploads(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+
+# ---------- LOGOUT ----------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>User Dashboard</h3>
+
+<form method="GET" action="/user_dashboard" class="mb-3">
+<input class="form-control" name="q" placeholder="Search products..." value="{{query}}">
+</form>
+
+{% for p in products %}
+<div class="card p-3 mb-3">
+
+    <img src="/uploads/{{p.image}}" width="120">
+
+    <h5>{{p.name}}</h5>
+
+    <div>⭐ {{p.avg}} / 5 ({{p.count}} reviews)</div>
+
+    <form method="POST" action="/review/{{p.id}}">
+        <input class="form-control mb-2" name="text" placeholder="Review">
+        <input type="number" name="rating" min="1" max="5" class="form-control mb-2">
+        <button class="btn btn-primary btn-sm">Submit</button>
+    </form>
+
+    <a href="/product/{{p.id}}">View</a>
+
+</div>
+{% endfor %}
+
+{% endblock %}
