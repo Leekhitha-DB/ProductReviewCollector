@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<p><b>Total Users:</b> {{users}}</p>
+
+<h4>Add Product</h4>
+<form method="POST" action="/add_product">
+<input class="form-control mb-2" name="name">
+<button class="btn btn-success">Add</button>
+</form>
+
+<h4>Pending Reviews</h4>
+{% for r in pending %}
+<div class="card p-2 mb-2">
+{{r.text}} ({{r.user}})
+<a href="/approve/{{r.id}}" class="btn btn-success btn-sm">Approve</a>
+<a href="/delete/{{r.id}}" class="btn btn-danger btn-sm">Delete</a>
+</div>
+{% endfor %}
+{% endblock %}

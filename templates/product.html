@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{product.name}}</h2>
+
+{% for r in reviews %}
+<div class="card p-2 mb-2">
+⭐ {{r.rating}} - {{r.text}} ({{r.user}})
+</div>
+{% endfor %}
+{% endblock %}
