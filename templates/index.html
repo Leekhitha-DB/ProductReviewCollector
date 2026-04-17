@@ -1,18 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
+
 <h2>Products</h2>
 
 {% for p in products %}
 <div class="card p-3 mb-3">
+
     <h5>{{p.name}}</h5>
 
-    <form method="POST" action="/review/{{p.id}}">
-        <input class="form-control mb-2" name="rating" type="number" min="1" max="5">
-        <input class="form-control mb-2" name="text" placeholder="Write review">
-        <button class="btn btn-primary">Submit</button>
+    <!-- ⭐ Rating Display -->
+    <div>
+        <span class="star-display">
+            ⭐ {{p.avg_rating}} / 5
+        </span>
+        <span class="text-muted">
+            ({{p.review_count}} reviews)
+        </span>
+    </div>
+
+    <!-- Review Form -->
+    <form method="POST" action="/review/{{p.id}}" class="mt-2">
+
+        <div class="rating mb-2">
+            <input type="radio" name="rating" value="5" id="5{{p.id}}" required><label for="5{{p.id}}">★</label>
+            <input type="radio" name="rating" value="4" id="4{{p.id}}"><label for="4{{p.id}}">★</label>
+            <input type="radio" name="rating" value="3" id="3{{p.id}}"><label for="3{{p.id}}">★</label>
+            <input type="radio" name="rating" value="2" id="2{{p.id}}"><label for="2{{p.id}}">★</label>
+            <input type="radio" name="rating" value="1" id="1{{p.id}}"><label for="1{{p.id}}">★</label>
+        </div>
+
+        <input class="form-control mb-2" name="text" placeholder="Write review" required>
+
+        <button class="btn btn-primary btn-sm">Submit</button>
     </form>
 
     <a href="/product/{{p.id}}">View Reviews</a>
+
 </div>
 {% endfor %}
+
 {% endblock %}

@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import json, os
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"
+app.secret_key = "secret123"
 
 DATA_FILE = "data.json"
 
@@ -17,81 +17,94 @@ def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-# ---------- AUTH ----------
+# ---------- LOGIN ----------
 @app.route("/", methods=["GET", "POST"])
 def login():
     data = load_data()
 
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        u = request.form["username"]
+        p = request.form["password"]
 
-        # Admin login
-        if username == "admin" and password == "admin123":
+        if u == "admin" and p == "admin123":
             session["admin"] = True
             return redirect("/admin")
 
-        # User login
         for user in data["users"]:
-            if user["username"] == username and check_password_hash(user["password"], password):
-                session["user"] = username
+            if user["username"] == u and check_password_hash(user["password"], p):
+                session["user"] = u
                 return redirect("/home")
-
-        flash("Invalid credentials")
 
     return render_template("login.html")
 
+# ---------- REGISTER ----------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     data = load_data()
 
     if request.method == "POST":
-        username = request.form["username"]
-        password = generate_password_hash(request.form["password"])
-
         data["users"].append({
-            "username": username,
-            "password": password
+            "username": request.form["username"],
+            "password": generate_password_hash(request.form["password"])
         })
-
         save_data(data)
         return redirect("/")
 
     return render_template("register.html")
 
-# ---------- USER ----------
+# ---------- HOME ----------
 @app.route("/home")
 def home():
-    if "user" not in session:
-        return redirect("/")
     data = load_data()
+
+    for p in data["products"]:
+        reviews = [r for r in data["reviews"] if r["product_id"] == p["id"] and r["approved"]]
+
+        if reviews:
+            avg = sum(r["rating"] for r in reviews) / len(reviews)
+            p["avg_rating"] = round(avg, 1)
+            p["review_count"] = len(reviews)
+        else:
+            p["avg_rating"] = 0
+            p["review_count"] = 0
+
     return render_template("index.html", products=data["products"])
 
+# ---------- ADD REVIEW ----------
 @app.route("/review/<int:pid>", methods=["POST"])
 def add_review(pid):
     data = load_data()
 
-    review = {
+    data["reviews"].append({
         "id": len(data["reviews"]) + 1,
         "product_id": pid,
         "user": session.get("user"),
         "rating": int(request.form["rating"]),
         "text": request.form["text"],
         "approved": False
-    }
+    })
 
-    data["reviews"].append(review)
     save_data(data)
     return redirect("/home")
 
+# ---------- PRODUCT PAGE ----------
 @app.route("/product/<int:pid>")
 def product(pid):
     data = load_data()
+
     product = next(p for p in data["products"] if p["id"] == pid)
 
     reviews = [r for r in data["reviews"] if r["product_id"] == pid and r["approved"]]
 
-    return render_template("product.html", product=product, reviews=reviews)
+    avg = 0
+    if reviews:
+        avg = round(sum(r["rating"] for r in reviews) / len(reviews), 1)
+
+    return render_template("product.html",
+                           product=product,
+                           reviews=reviews,
+                           avg=avg,
+                           count=len(reviews))
 
 # ---------- ADMIN ----------
 @app.route("/admin")
