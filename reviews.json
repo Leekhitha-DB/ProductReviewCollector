@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "product_id": 1,
+        "user_id": 2,
+        "rating": 4,
+        "text": "good, worth of cost"
+    },
+    {
+        "id": 2,
+        "product_id": 2,
+        "user_id": 2,
+        "rating": 5,
+        "text": "good product\r\n"
+    },
+    {
+        "id": 3,
+        "product_id": 2,
+        "user_id": 5,
+        "rating": 3,
+        "text": "expected a lot, but still worth the cost"
+    }
+]

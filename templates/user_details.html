@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+</head>
+<body>
+    <h1>User Details</h1>
+    <h2>{{ user.name }}</h2>
+    <p>Email: {{ user.email }}</p>
+
+    <h3>Reviews</h3>
+    {% for review in reviews %}
+    <div>
+        <h4>{{ review.product_name }}</h4>
+        <img src="{{ url_for('static', filename='uploads/' ~ review.product_image) }}" alt="{{ review.product_name }}" width="100">
+        <p>Review: {{ review.review_text }}</p>
+        <p>Rating: {{ review.rating }}</p>
+    </div>
+    {% endfor %}
+
+    <a href="/admin">Back to Admin Dashboard</a>
+</body>
+</html>

@@ -1,17 +1,33 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
+<h3>{{product.name}}</h3>
+<img src="/static/uploads/{{product.image}}" width="200">
+<p>{{product.description}}</p>
 
-<h2>{{product.name}}</h2>
-
-<div class="mb-2">
-    ⭐ {{avg}} / 5 ({{count}} reviews)
+<form method="POST">
+<div id="stars">
+<span class="star" data=1>★</span>
+<span class="star" data=2>★</span>
+<span class="star" data=3>★</span>
+<span class="star" data=4>★</span>
+<span class="star" data=5>★</span>
 </div>
+<input type="hidden" name="rating" id="rating">
+<textarea name="text" class="form-control"></textarea>
+<button class="btn btn-success mt-2">Submit</button>
+</form>
+
+<script>
+document.querySelectorAll('.star').forEach(s=>{
+ s.onclick=()=>{
+  document.getElementById('rating').value=s.getAttribute('data');
+  document.querySelectorAll('.star').forEach(x=>x.classList.remove('selected'));
+  s.classList.add('selected');
+ }
+})
+</script>
 
 {% for r in reviews %}
-<div class="card p-2 mb-2">
-    ⭐ {{r.rating}} - {{r.text}}
-    <small class="text-muted">by {{r.user}}</small>
-</div>
+<p>{{r.text}} - {{r.rating}}⭐</p>
 {% endfor %}
-
 {% endblock %}

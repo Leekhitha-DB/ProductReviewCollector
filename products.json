@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "name": "Charger",
+        "description": "Samsung Original 25W USB Type-C Travel Adaptor Without Cable for Google Pixel, Xiaomi, Motorola, iPhone, Samsung Galaxy Tab S/A Series, Galaxy S10/M54/M55/A80/A90/S25/S24, White",
+        "image": "charger.jpg",
+        "created_by": 3,
+        "avg_rating": 4.0,
+        "review_count": 1
+    },
+    {
+        "id": 2,
+        "name": "Mobile Case",
+        "description": "Spigen Ultra Hybrid Back Cover Case for iPhone 15, Durable Hybrid Structure, Air Cushion Technology - PC+TPU | Matte Black",
+        "image": "case.jpg",
+        "created_by": 3,
+        "avg_rating": 4.0,
+        "review_count": 2
+    },
+    {
+        "id": 3,
+        "name": "product 1",
+        "description": "description",
+        "image": "134013734058120190.jpg",
+        "created_by": 3,
+        "avg_rating": 0,
+        "review_count": 0
+    }
+]

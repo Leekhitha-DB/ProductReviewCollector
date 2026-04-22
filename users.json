@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "password": "scrypt:32768:8:1$admin$hashedpassword",
+        "role": "admin"
+    },
+    {
+        "id": 2,
+        "name": "Leekhitha D B",
+        "email": "likidb@gmail.com",
+        "password": "scrypt:32768:8:1$nThXnzpor4f8bHoG$e4842c751fca99ce260b468837fed7ab865be279ced786e42949b4815f5f9d3c2c2aa18c42ec0684bfbfccf38905ff3211a8e52e425392d40ecf98a6699b3df1",
+        "role": "user"
+    },
+    {
+        "id": 3,
+        "name": "admin",
+        "email": "admin@gmail.com",
+        "password": "scrypt:32768:8:1$3rVYyjrKY9tLLDPg$6589d41e686396e89102244b1e6530b9417c4f97d298ea44c21908bfa5e0bb713977ec63214d807447cba3c834aa8e6510ea3dde09596d35540937e54c122118",
+        "role": "admin"
+    },
+    {
+        "id": 4,
+        "name": "Monika",
+        "email": "moni@gmail.com",
+        "password": "scrypt:32768:8:1$5Rd4loxZrPLuYWd2$c5dca11e768885a68fd5bfe77c3e9673cc230aacb19118cde21763fde7c990b24eb65e631bd0c6a5947a2e120cf4246ba5b956a6ade2ef84f257b6ca5f873392",
+        "role": "user"
+    },
+    {
+        "id": 5,
+        "name": "Lekhana",
+        "email": "lekhana@gmail.com",
+        "password": "scrypt:32768:8:1$C2RAifL67qntieob$8d1c8641d559dd82623495af129424e0710760cfb18781a9a1d3d45160533c77422ab2ed6e6d6c3ea50afbef941f4df7d9cf60c34af4b7acc829c246ccb9fe20",
+        "role": "user"
+    }
+]

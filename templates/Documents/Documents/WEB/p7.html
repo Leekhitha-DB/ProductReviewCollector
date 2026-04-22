@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>JSON Utilities</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+background-color: #f5f5f5;
+}
+textarea, input, button {
+width: 100%;
+padding: 8px;
+margin: 6px 0;
+}
+textarea {
+height: 100px;
+}
+.section {
+background: white;
+padding: 15px;
+margin-bottom: 20px;
+border-radius: 6px;
+box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+pre {
+background: #eee;
+padding: 10px;
+white-space: pre-wrap;
+}
+button {
+background: #007bff;
+border: none;
+color: white;
+cursor: pointer; 
+}
+button:hover {
+background: #0056b3;
+}
+</style>
+</head>
+<body>
+<h1>JSON Utilities</h1>
+<!-- a) JSON to JavaScript Object -->
+<div class="section">
+<h2>a) JSON Text → JavaScript Object</h2>
+<textarea id="jsonInput"
+placeholder='{"name":"Alice","age":25,"skills":["JavaScript","HTML","CSS"]}'></textarea>
+<button onclick="convertToObject()">Convert</button>
+<pre id="jsObjectOutput"></pre>
+</div>
+<!-- b) Convert JSON Date -->
+<div class="section">
+<h2>b) Convert JSON Date String → Date Object</h2>
+<textarea id="jsonDateInput" placeholder='{"event":"Meeting","date":"2025-08-12T10:30:00Z"}'></textarea>
+<button onclick="convertDate()">Convert Date</button>
+<pre id="dateOutput"></pre>
+</div>
+<!-- c) JSON ↔ CSV -->
+<div class="section">
+<h2>c) JSON ↔ CSV</h2>
+<textarea id="jsonCsvInput" placeholder='[{"name":"Alice","age":25},{"name":"Bob","age":30}]'></textarea>
+<button onclick="jsonToCsv()">JSON to CSV</button>
+<button onclick="csvToJson()">CSV to JSON</button>
+<pre id="csvJsonOutput"></pre>
+</div>
+<!-- d) Hash from String -->
+<div class="section">
+<h2>d) Create Hash from String (Browser Web Crypto API)</h2>
+<input type="text" id="hashInput" placeholder="Enter text to hash">
+<button onclick="createHash()">Generate SHA-256 Hash</button>
+<pre id="hashOutput"></pre>
+</div>
+<script>
+// a) JSON to JavaScript Object
+function convertToObject() {
+try {
+let jsonText = document.getElementById("jsonInput").value;
+let obj = JSON.parse(jsonText);
+document.getElementById("jsObjectOutput").textContent = JSON.stringify(obj, null, 2);
+} catch (e) {
+document.getElementById("jsObjectOutput").textContent = "Invalid JSON!";
+}
+}
+// b) Convert JSON Date
+function convertDate() {
+try {
+let jsonText = document.getElementById("jsonDateInput").value;
+let obj = JSON.parse(jsonText);
+let date = new Date(obj.date);
+document.getElementById("dateOutput").textContent = date.toString();
+} catch (e) {
+document.getElementById("dateOutput").textContent = "Invalid JSON or Date!";
+}
+}
+// c) JSON to CSV
+function jsonToCsv() {
+try {
+let jsonArray = JSON.parse(document.getElementById("jsonCsvInput").value);
+let keys = Object.keys(jsonArray[0]);
+let csv = keys.join(",") + "\n" +
+jsonArray.map(row => keys.map(k => row[k]).join(",")).join("\n");
+document.getElementById("csvJsonOutput").textContent = csv;
+} catch (e) {
+document.getElementById("csvJsonOutput").textContent = "Invalid JSON!";
+}
+}
+// c) CSV to JSON
+function csvToJson() {
+try {
+let csv = document.getElementById("jsonCsvInput").value;
+let lines = csv.trim().split("\n");
+let keys = lines[0].split(",");
+let jsonArray = lines.slice(1).map(line => {
+let values = line.split(",");
+let obj = {};
+keys.forEach((key, i) => obj[key] = values[i]);
+return obj;
+});
+document.getElementById("csvJsonOutput").textContent = JSON.stringify(jsonArray, null, 2);
+} catch (e) {
+document.getElementById("csvJsonOutput").textContent = "Invalid CSV!";
+}
+}
+// d) Hash from String (Web Crypto API)
+async function createHash() {
+let text = document.getElementById("hashInput").value;
+if (!text) {
+document.getElementById("hashOutput").textContent = "Please enter some text!";
+return;
+}
+let encoder = new TextEncoder();
+let data = encoder.encode(text);
+let hashBuffer = await crypto.subtle.digest("SHA-256", data);
+let hashArray = Array.from(new Uint8Array(hashBuffer));
+let hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+document.getElementById("hashOutput").textContent = hashHex;
+}
+</script>
+</body>
+</html>

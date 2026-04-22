@@ -1,0 +1,332 @@
+import java.util.Scanner;
+public class BellmanFord {
+public static void bellmanFord(int vertices, int source, int edgesCount, int edges[][]) {
+int INF = 999999;
+int[] dist = new int[vertices + 1];
+int[] predecessor = new int[vertices + 1];
+for (int i = 1; i <= vertices; i++) {
+dist[i] = INF;
+predecessor[i] = -1;
+}
+dist[source] = 0;
+predecessor[source] = source;
+for (int i = 1; i <= vertices - 1; i++) {
+for (int j = 1; j <= edgesCount; j++) {
+int u = edges[j][0];
+int v = edges[j][1];
+int w = edges[j][2];
+if (dist[u] != INF && dist[v] > dist[u] + w) {
+dist[v] = dist[u] + w;
+predecessor[v] = u;
+}}}
+for (int j = 1; j <= edgesCount; j++) {
+int u = edges[j][0];
+int v = edges[j][1];
+int w = edges[j][2];
+if (dist[u] != INF && dist[v] > dist[u] + w) {
+System.out.println("Graph contains a negative-weight cycle. Shortest path not guaranteed.");
+return;
+}}
+System.out.println("Vertex\tDistance from Source\tPath");
+for (int i = 1; i <= vertices; i++) {
+System.out.print(i + "\t\t");
+if (dist[i] == INF) {
+System.out.println("INF\t\t\tNo path");
+} else {
+System.out.print(dist[i] + "\t\t\t");
+printPath(predecessor, i);
+System.out.println();
+}}}
+private static void printPath(int[] predecessor, int vertex) {
+if (predecessor[vertex] == vertex) {
+System.out.print(vertex);
+return;
+} else if (predecessor[vertex] == -1) {
+System.out.print("No path");
+return;
+}
+printPath(predecessor, predecessor[vertex]);
+System.out.print(" -> " + vertex);
+}
+public static void main(String[] args) {
+Scanner scanner = new Scanner(System.in);
+System.out.print("Enter number of vertices: ");
+int vertices = scanner.nextInt();
+System.out.print("Enter number of edges: ");
+int edgesCount = scanner.nextInt();
+int[][] edges = new int[edgesCount + 1][3];
+System.out.println("Enter edges (from to weight):");
+for (int i = 1; i <= edgesCount; i++) {
+edges[i][0] = scanner.nextInt();
+edges[i][1] = scanner.nextInt();
+edges[i][2] = scanner.nextInt();   
+}
+System.out.print("Enter source vertex: ");
+int source = scanner.nextInt();
+bellmanFord(vertices, source, edgesCount, edges);
+scanner.close();
+}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import java.net.*;
+import java.io.*;
+public class TCPServer {
+public static void main(String args[]) throws Exception {
+ServerSocket sersock = new ServerSocket(4000);
+System.out.println("Server ready for connection");
+Socket sock = sersock.accept(); 
+System.out.println("Connection is successful and wating for chatting");
+InputStream istream = sock.getInputStream( );
+BufferedReader fileRead =new BufferedReader(new InputStreamReader(istream));
+String fname = fileRead.readLine( );
+BufferedReader contentRead = new BufferedReader(new FileReader(fname) );
+OutputStream ostream = sock.getOutputStream( );
+PrintWriter pwrite = new PrintWriter(ostream, true);
+String str;
+while((str = contentRead.readLine()) != null)  {
+pwrite.println(str); 
+}
+sock.close();
+sersock.close();
+pwrite.close();
+fileRead.close();
+contentRead.close();
+}
+}
+
+
+import java.net.*;
+import java.io.*;
+public class TCPClient
+{
+public static void main( String args[ ] ) throws Exception
+{
+Socket sock = new Socket( "127.0.0.1", 4000);
+System.out.print("Enter the file name");
+BufferedReader keyRead = new BufferedReader(new InputStreamReader(System.in));
+String fname = keyRead.readLine();
+OutputStream ostream = sock.getOutputStream( );
+PrintWriter pwrite = new PrintWriter(ostream, true);
+pwrite.println(fname);
+InputStream istream = sock.getInputStream();
+BufferedReader socketRead = new BufferedReader(new InputStreamReader(istream));
+String str;
+while((str = socketRead.readLine()) != null)  {
+System.out.println(str);
+}
+pwrite.close(); 
+socketRead.close(); 
+keyRead.close();
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import java.net.*;
+import java.util.Scanner;
+public class UDPServer {
+public static void main(String[] args) {
+DatagramSocket socket = null;
+Scanner scanner = new Scanner(System.in);
+try {
+socket = new DatagramSocket(6788);
+System.out.println("Server started, waiting for client message...");
+byte[] buffer = new byte[1024];
+while (true) {
+DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+socket.receive(request);
+String clientMsg = new String(request.getData(), 0, request.getLength());
+System.out.println("Received from client: " + clientMsg);
+System.out.print("Enter message to send to client: ");
+String msgToClient = scanner.nextLine();               
+byte[] sendData = msgToClient.getBytes();
+DatagramPacket reply = new DatagramPacket(sendData, sendData.length, request.getAddress(), request.getPort());
+socket.send(reply);
+}
+} catch (Exception e) {
+e.printStackTrace();
+} finally {
+if (socket != null) socket.close();
+scanner.close();
+}}}
+
+
+
+
+
+import java.net.*;
+public class UDPClient {
+public static void main(String[] args) {
+DatagramSocket socket = null;
+try {
+socket = new DatagramSocket();
+String message = "Hello Server";
+byte[] sendData = message.getBytes();
+InetAddress serverAddress = InetAddress.getByName("127.0.0.1");
+int serverPort = 6788;
+DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, serverAddress, serverPort);
+socket.send(sendPacket);
+byte[] receiveBuffer = new byte[1024];
+DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+socket.receive(receivePacket);
+String receivedMsg = new String(receivePacket.getData(), 0, receivePacket.getLength());
+System.out.println("Message from server: " + receivedMsg);
+} catch (Exception e) {
+e.printStackTrace();
+} finally {
+if (socket != null) socket.close();
+}}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import java.util.Scanner;
+public class RSA {
+static int gcd(int a, int b) {
+while (b != 0) {
+int r = a % b;
+a = b;
+b = r;
+}
+return a;
+}
+static int modExp(int base, int exponent, int modulus) {
+int result = 1;
+base = base % modulus;
+while (exponent > 0) {
+if ((exponent & 1) == 1) 
+result = (result * base) % modulus;
+base = (base * base) % modulus;
+exponent >>= 1;        
+}
+return result;
+}
+public static void main(String[] args) {
+Scanner sc = new Scanner(System.in);
+System.out.print("Enter the message to be encrypted (lowercase letters only): ");
+String message = sc.nextLine();
+System.out.print("Enter two prime numbers (p and q): ");
+int p = sc.nextInt();
+int q = sc.nextInt();
+int n = p * q;
+int phi = (p - 1) * (q - 1);
+int e = 2;
+for (; e < phi; e++) {
+if (gcd(e, phi) == 1) break;
+}
+int d = 2;
+for (; d < phi; d++) {
+if ((d * e) % phi == 1) break;
+}
+System.out.println("\nPublic key (n, e): (" + n + ", " + e + ")");
+System.out.println("Private key (n, d): (" + n + ", " + d + ")");
+int length = message.length();
+int[] numericMessage = new int[length];
+int[] encrypted = new int[length];
+int[] decrypted = new int[length];
+for (int i = 0; i < length; i++) {
+numericMessage[i] = message.charAt(i) - 'a' + 1;
+}
+for (int i = 0; i < length; i++) {
+encrypted[i] = modExp(numericMessage[i], e, n);
+}
+System.out.print("\nEncrypted message (numeric): ");
+for (int val : encrypted) {
+System.out.print(val + " ");
+}
+System.out.print("\nEncrypted message (chars): ");
+for (int val : encrypted) {
+char ch = (val >= 1 && val <= 26) ? (char)(val + 'a' - 1) : '?';
+System.out.print(ch);
+}
+System.out.println();
+for (int i = 0; i < length; i++) {
+decrypted[i] = modExp(encrypted[i], d, n);
+}
+System.out.print("\nDecrypted message: ");
+for (int val : decrypted) {
+System.out.print((char)(val + 'a' - 1));
+}
+System.out.println();
+sc.close();
+}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import java.util.Scanner;
+public class Leaky {
+public static int bucketSize = 1000;
+public static int outputRate = 100;
+public static void sendPacket(int pktSize) {
+if (pktSize > bucketSize) {
+System.out.println("Bucket Overflow");
+} else {
+while (pktSize > outputRate) {
+System.out.println(outputRate + " bytes of packet is sent");
+pktSize = pktSize - outputRate;
+}
+System.out.println(pktSize + " bytes of packet is sent");
+}}
+public static void main(String[] args) {
+Scanner scanner = new Scanner(System.in);
+System.out.print("Enter the number of packets: ");
+int numPackets = scanner.nextInt();
+if (numPackets > 0) {
+for (int i = 1; i <= numPackets; i++) {
+System.out.print("Enter the packet " + i + " size: ");
+int pktSize = scanner.nextInt();
+sendPacket(pktSize);
+}
+} else {
+System.out.println("No packets to send");
+}
+scanner.close();
+}}

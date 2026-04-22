@@ -1,0 +1,75 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <title>jQuery Append and Animate Example</title> 
+    <style> 
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin-top: 50px; 
+        } 
+        #box { 
+            width: 100px; 
+            height: 100px; 
+            background-color: red; 
+            position: relative; 
+            margin: 20px auto; 
+        } 
+        p, ul { 
+            width: 300px; 
+            margin: auto; 
+            text-align: left; 
+        } 
+        button { 
+            padding: 10px; 
+            margin: 5px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+        } 
+        button:hover { 
+            background: #45a049; 
+        } 
+    </style> 
+    <!-- jQuery CDN --> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+</head> 
+<body> 
+ 
+    <h2>jQuery Append, Animate & Change Color</h2> 
+ 
+    <p id="para">This is an existing paragraph.</p> 
+    <ul id="list"> 
+        <li>Item 1</li> 
+        <li>Item 2</li> 
+    </ul> 
+ 
+    <div id="box"></div> 
+ 
+    <button id="appendBtn">Append Content</button> 
+    <button id="animateBtn">Animate & Change Color</button> 
+    <script> 
+        $(document).ready(function(){ 
+            // Append content 
+            $("#appendBtn").click(function(){ 
+                $("#para").append(" Appended text at the end."); 
+                $("#list").append("<li>New appended item</li>"); 
+            }); 
+ 
+            // Animate box and change color 
+            $("#animateBtn").click(function(){ 
+                $("#box").animate({ 
+                    left: '150px', 
+                    height: '150px', 
+                    width: '150px' 
+                }, 1000, function(){ 
+                    // After animation completes 
+                    $(this).css("background-color", "blue"); 
+                }); 
+            }); 
+        }); 
+    </script> 
+ 
+</body> 
+</html> 
